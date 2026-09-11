@@ -103,7 +103,14 @@ class Grammar:
         Args:
             grammar_file (str): Path to the raw grammar file 
         """
-        raise NotImplementedError
+        self.rules = defaultdict(list)
+        with open(grammar_file, 'r') as file:
+            for line in file:
+                line = line.strip()
+                if not line:
+                    continue
+                incidence, lhs, rhs = line.split('\t')
+                self.rules[lhs].append([int(incidence), rhs])
 
     def sample(self, derivation_tree, max_expansions, start_symbol):
         """
@@ -121,7 +128,38 @@ class Grammar:
         Returns:
             str: the random sentence or its derivation tree
         """
-        raise NotImplementedError
+        if derivation_tree:
+
+        else:
+            non_terminal_options = {}
+            non_terminal_max = 0
+            terminal_options = [] 
+            terminal_max = 0
+
+            for incidence, rhs in self.rules[start_symbol]:
+                if not is_terminal(rhs)
+                    for i in range(incidence):
+                        options[non_terminal_max] = rhs
+                        non_terminal_max += 1
+                
+
+            random_index = random.randint(0, non_terminal_max - 1)
+
+            non_terminal_result = non_terminal_options[random_index]
+
+            # now find vocab
+
+            for incidence, rhs in self.rules[non_terminal_result]:
+                if is_terminal(rhs):
+                    for i in range(incidence):
+                        terminal_options[terminal_max] = rhs
+                        terminal_max += 1
+        
+            random_index = random.randint(0, terminal_max - 1)
+            terminal_result = terminal_options[random_index]
+
+
+            return start_symbol + terminal_result if max_expansions == 0 else start_symbol + " " + terminal_result + " " + self.sample(derivation_tree, max_expansions - 1, non_terminal_result)
 
 
 ####################
