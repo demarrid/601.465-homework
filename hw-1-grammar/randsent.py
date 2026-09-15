@@ -15,7 +15,7 @@ import argparse
 import os
 import random
 import subprocess
-import sys
+from collections import defaultdict
 
 # Want to know what command-line arguments a program allows?
 # Commonly you can ask by passing it the --help option, like this:
@@ -107,10 +107,15 @@ class Grammar:
         with open(grammar_file, 'r') as file:
             for line in file:
                 line = line.strip()
-                if not line:
+                if not line or line.startswith('#'):
                     continue
-                incidence, lhs, rhs = line.split('\t')
-                self.rules[lhs].append([int(incidence), rhs])
+                if '#' in line:
+                    line = line[:line.index('#')].strip()
+                parts = line.split('\t')
+                if len(parts) != 3:
+                    continue
+                incidence, lhs, rhs = parts
+                self.rules[lhs].append([int(incidence), rhs.strip()])
 
     def sample(self, derivation_tree, max_expansions, start_symbol):
         """
@@ -128,38 +133,41 @@ class Grammar:
         Returns:
             str: the random sentence or its derivation tree
         """
+
+        def is_terminal(rhs):
+            for m in rhs.split(" "):
+                if self.rules[m]:
+                    return False
+            return True
+
+        options = []
+        for incidence, rhs in self.rules[start_symbol]:
+            options.extend([rhs] * int(incidence))
+        result = random.choice(options)
+
         if derivation_tree:
-
-        else:
-            non_terminal_options = {}
-            non_terminal_max = 0
-            terminal_options = [] 
-            terminal_max = 0
-
-            for incidence, rhs in self.rules[start_symbol]:
-                if not is_terminal(rhs)
-                    for i in range(incidence):
-                        options[non_terminal_max] = rhs
-                        non_terminal_max += 1
-                
-
-            random_index = random.randint(0, non_terminal_max - 1)
-
-            non_terminal_result = non_terminal_options[random_index]
-
-            # now find vocab
-
-            for incidence, rhs in self.rules[non_terminal_result]:
-                if is_terminal(rhs):
-                    for i in range(incidence):
-                        terminal_options[terminal_max] = rhs
-                        terminal_max += 1
-        
-            random_index = random.randint(0, terminal_max - 1)
-            terminal_result = terminal_options[random_index]
-
-
-            return start_symbol + terminal_result if max_expansions == 0 else start_symbol + " " + terminal_result + " " + self.sample(derivation_tree, max_expansions - 1, non_terminal_result)
+            if is_terminal(result):
+                return "(" + start_symbol + " " + result + ")"
+            if max_expansions == 0:
+                return "(" + start_symbol + " ...)"
+            parts = []
+            for m in result.split(" "):
+                if self.rules[m]:
+                    parts.append(self.sample(derivation_tree, max_expansions - 1, m))
+                else:
+                    parts.append(m)
+            return "(" + start_symbol + " " + " ".join(parts) + ")"
+        if is_terminal(result):
+            return result
+        if max_expansions == 0:
+            return "..."
+        parts = []
+        for m in result.split(" "):
+            if self.rules[m]:
+                parts.append(self.sample(derivation_tree, max_expansions - 1, m))
+            else:
+                parts.append(m)
+        return " ".join(parts)
 
 
 ####################
@@ -187,7 +195,7 @@ def main():
             prettyprint_path = os.path.join(os.getcwd(), 'prettyprint')
             subprocess.run(
                 ['perl', prettyprint_path],
-                input=sentence,
+                check=False, input=sentence,
                 text=True
             )
         else:
