@@ -1,0 +1,187 @@
+6	ROOT	S .
+1	ROOT	S !
+1	ROOT	is it true that S ?     # mixing terminals and nonterminals is ok.
+2	ROOT	Q ?
+2	ROOT	QW ?
+
+#    S    = sentence
+#    Q    = yes-no question
+#    SBAR = sentence packed up as a subordinate clause ("that ...")
+#    NP   = noun phrase
+#    VP   = verb phrase
+#    PP   = prepositional phrase
+#    RelC = relative clause
+#    Det  = determiner (sometimes called "article")
+#    Prep = preposition
+#    Adj  = adjective
+#    Adv  = degree adverb modifying an adjective ("very")
+#    Conj = coordinating conjunction
+#    Aux  = auxiliary that fronts in a question and takes a bare verb
+
+
+24	S	NP VP
+1	S	SBAR VPpsych
+1	S	it VPpsych SBAR
+1	S	S Conj S
+
+1	SBAR	that S
+
+8	Q	Aux NP VP[base]
+1	Q	Aux it VPpsych[base] SBAR
+
+1	Aux	did
+1	Aux	will
+1	Aux	would
+1	Aux	could
+1	Aux	should
+
+3	QW	WHnp Aux NP VP[base]/NP
+2	QW	WHnp VP
+2	QW	WHadv Aux NP VP[base]
+
+2	WHnp	what
+2	WHnp	who
+2	WHadv	where
+1	WHadv	when
+1	WHadv	why
+1	WHadv	how
+
+2	VP	Vwonder QEmb
+2	VP[base]	Vwonder[base] QEmb
+1	QEmb	WHnp S/NP
+1	QEmb	WHadv S
+
+2	Vwonder	wondered
+1	Vwonder	asked
+2	Vwonder[base]	wonder
+1	Vwonder[base]	ask
+
+2	VP[base]/NP	Vtrans[base]
+1	VP[base]/NP	Vcomp[base]             # what did the president think X
+1	VP[base]/NP	Vcomp[base] SBAR/NP
+1	VP[base]/NP	VPpsych[base]/NP
+1	VP[base]/NP	VP[base]/NP PP
+1	VP[base]/NP	VP[base] PP/NP
+1	VPpsych[base]/NP	Vpsych[base]
+
+8	VP	Vintrans
+16	VP	Vtrans NP
+3	VP	Vcomp SBAR
+3	VP	VPpsych
+
+8	VP[base]	Vintrans[base]
+16	VP[base]	Vtrans[base] NP
+3	VP[base]	Vcomp[base] SBAR
+3	VP[base]	VPpsych[base]
+
+1	VPpsych	Vpsych NP
+1	VPpsych[base]	Vpsych[base] NP
+
+3	VP	VP PP
+1	VP	VP Conj VP
+3	VP[base]	VP[base] PP
+1	VP[base]	VP[base] Conj VP[base]
+
+24	NP	Det Noun
+5	NP	Proper
+4	NP	NP PP
+3	NP	NP Conj NP
+4	NP	NP RelC
+
+5	Noun	Adj Noun
+
+1	PP	Prep NP
+
+1	RelC	that S/NP
+
+1	S/NP	VP
+2	S/NP	NP VP/NP
+
+2	VP/NP	Vtrans
+1	VP/NP	Vcomp
+1	VP/NP	Vcomp SBAR/NP
+1	VP/NP	VPpsych/NP
+1	VP/NP	VP/NP PP
+1	VP/NP	VP PP/NP
+1	VPpsych/NP	Vpsych
+1	SBAR/NP	that S/NP
+1	PP/NP	Prep
+
+1	Vtrans	Vtrans Conj Vtrans
+1	Vintrans	Vintrans Conj Vintrans
+1	Vtrans[base]	Vtrans[base] Conj Vtrans[base]
+1	Vintrans[base]	Vintrans[base] Conj Vintrans[base]
+
+3	Vtrans	ate
+3	Vtrans	wanted
+2	Vtrans	kissed
+2	Vtrans	understood
+1	Vtrans	pickled
+
+3	Vtrans[base]	eat
+3	Vtrans[base]	want
+2	Vtrans[base]	kiss
+2	Vtrans[base]	understand
+1	Vtrans[base]	pickle
+
+3	Vintrans	sighed
+3	Vintrans	worked
+1	Vintrans	waited
+
+3	Vintrans[base]	sigh
+3	Vintrans[base]	work
+1	Vintrans[base]	wait
+
+3	Vcomp	thought
+2	Vcomp	said
+2	Vcomp	knew
+1	Vcomp	believed
+
+3	Vcomp[base]	think
+2	Vcomp[base]	say
+2	Vcomp[base]	know
+1	Vcomp[base]	believe
+
+# any of these can replace "perplexed" in sentences #5 and #6
+3	Vpsych	perplexed
+2	Vpsych	surprised
+2	Vpsych	bothered
+1	Vpsych	delighted
+
+3	Vpsych[base]	perplex
+2	Vpsych[base]	surprise
+2	Vpsych[base]	bother
+1	Vpsych[base]	delight
+
+3	Det	the
+3	Det	a
+1	Det	every
+
+2	Proper	Sally
+1	Proper	Washington
+
+2	Noun	president
+3	Noun	sandwich
+3	Noun	pickle
+2	Noun	chief of staff
+2	Noun	proposal
+2	Noun	desk
+1	Noun	floor
+
+1	Adj	fine
+2	Adj	delicious
+2	Adj	perplexed
+2	Adj	pickled
+
+1	Adj	Adv Adj
+3	Adv	very
+1	Adv	rather
+1	Adv	quite
+
+3	Conj	and
+1	Conj	or
+
+3	Prep	with
+3	Prep	in
+2	Prep	on
+1	Prep	under

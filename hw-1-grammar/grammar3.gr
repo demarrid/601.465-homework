@@ -1,0 +1,141 @@
+# grammar3.gr -- grammar2.gr plus the phenomena of Section 2.2.
+#
+# Conventions (inherited from grammar.gr):
+#    - terminals are lowercase              (president)
+#    - preterminals are capitalized         (Noun)
+#    - other nonterminals are all-caps      (NP)
+#
+# Verbs are split into preterminals by SUBCATEGORIZATION -- that is, by which
+# complements the verb demands.  That is what keeps the grammar from producing
+# *"the president thought that a sandwich sighed a pickle .": "sighed" is a
+# Vintrans, and no rule lets a Vintrans take an object.
+#
+#    Vintrans  no complement                sighed, worked
+#    Vtrans    one object noun phrase       ate, kissed
+#    Vcomp     a subordinate clause         thought, said
+#    Vpsych    an object, and optionally    perplexed, surprised
+#              a clause as its SUBJECT
+#######################
+
+# Rules for creating full sentences.
+
+6	ROOT	S .
+1	ROOT	S !
+1	ROOT	is it true that S ?     # mixing terminals and nonterminals is ok.
+
+# The basic grammar rules.  Here's what the abbreviations stand for:
+#    S    = sentence
+#    SBAR = sentence packaged up as a subordinate clause ("that ...")
+#    NP   = noun phrase
+#    VP   = verb phrase
+#    PP   = prepositional phrase
+#    Det  = determiner (sometimes called "article")
+#    Prep = preposition
+#    Adj  = adjective
+#    Adv  = degree adverb modifying an adjective ("very")
+#    Conj = coordinating conjunction
+
+# CLAUSES.  Besides the ordinary subject-predicate clause, a subordinate
+# clause can act as the subject of a psych verb (#6), and that clausal
+# subject can be extraposed to the end, leaving a dummy "it" behind (#5).
+24	S	NP VP
+1	S	SBAR VPpsych
+1	S	it VPpsych SBAR
+1	S	S Conj S
+
+1	SBAR	that S
+
+# VERB PHRASES.  One rule per subcategorization frame, so a verb can only
+# appear with the complements it actually allows.
+8	VP	Vintrans
+16	VP	Vtrans NP
+3	VP	Vcomp SBAR
+3	VP	VPpsych
+
+# A psych verb is an ordinary transitive except that its subject may be a
+# clause, so it gets its own phrase type for the two S rules above.
+1	VPpsych	Vpsych NP
+
+# Any verb phrase may be modified by a prepositional phrase.  This is what
+# gives "the president worked on every proposal on the desk ." and, in the
+# same stroke, "Sally ate a sandwich in the floor ."
+3	VP	VP PP
+1	VP	VP Conj VP
+
+# NOUN PHRASES.
+24	NP	Det Noun
+5	NP	Proper
+4	NP	NP PP
+3	NP	NP Conj NP
+
+5	Noun	Adj Noun
+
+1	PP	Prep NP
+
+# COORDINATION OF HEADS.  Coordinating two verbs that share one object is
+# what licenses "wanted and ate a sandwich" (as opposed to the VP-level
+# coordination above, which would give "wanted a sandwich and ate a pickle").
+1	Vtrans	Vtrans Conj Vtrans
+1	Vintrans	Vintrans Conj Vintrans
+
+# Vocabulary.  Your program can see that "ate" is a terminal
+# symbol because there exists no rule for rewriting it.
+# Any symbol that can rewrite as a terminal (or a string of
+# terminals, like "chief of staff") is called a "preterminal."  Notice
+# that a preterminal is a special kind of nonterminal.
+
+3	Vtrans	ate
+3	Vtrans	wanted
+2	Vtrans	kissed
+2	Vtrans	understood
+1	Vtrans	pickled
+
+3	Vintrans	sighed
+3	Vintrans	worked
+1	Vintrans	waited
+
+3	Vcomp	thought
+2	Vcomp	said
+2	Vcomp	knew
+1	Vcomp	believed
+
+# Any of these can replace "perplexed" in sentences #5 and #6.
+3	Vpsych	perplexed
+2	Vpsych	surprised
+2	Vpsych	bothered
+1	Vpsych	delighted
+
+3	Det	the
+3	Det	a
+1	Det	every
+
+2	Proper	Sally
+1	Proper	Washington
+
+2	Noun	president
+3	Noun	sandwich
+3	Noun	pickle
+2	Noun	chief of staff
+2	Noun	proposal
+2	Noun	desk
+1	Noun	floor
+
+1	Adj	fine
+2	Adj	delicious
+2	Adj	perplexed
+2	Adj	pickled
+
+# Degree adverbs stack, which is what makes "very very very perplexed" work
+# without listing each length separately.
+1	Adj	Adv Adj
+3	Adv	very
+1	Adv	rather
+1	Adv	quite
+
+3	Conj	and
+1	Conj	or
+
+3	Prep	with
+3	Prep	in
+2	Prep	on
+1	Prep	under

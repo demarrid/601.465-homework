@@ -106,16 +106,20 @@ class Grammar:
         self.rules = defaultdict(list)
         with open(grammar_file, 'r') as file:
             for line in file:
-                line = line.strip()
-                if not line or line.startswith('#'):
-                    continue
                 if '#' in line:
-                    line = line[:line.index('#')].strip()
-                parts = line.split('\t')
-                if len(parts) != 3:
+                    line = line[:line.index('#')]
+                # grammar symbols never contain whitespace
+                parts = line.split(None, 2)
+                if not parts:
                     continue
-                incidence, lhs, rhs = parts
-                self.rules[lhs].append([int(incidence), rhs.strip()])
+                if len(parts) == 1:
+                    raise ValueError(f"bad rule {grammar_file}: {line!r}")
+                weight = float(parts[0])
+                if weight <= 0:
+                    raise ValueError(f"weight must bepos: {line!r}")
+                lhs = parts[1]
+                rhs = parts[2].split() if len(parts) == 3 else []
+                self.rules[lhs].append([weight, rhs])
 
     def sample(self, derivation_tree, max_expansions, start_symbol):
         """
@@ -134,39 +138,26 @@ class Grammar:
             str: the random sentence or its derivation tree
         """
 
-        def is_terminal(rhs):
-            for m in rhs.split(" "):
-                if self.rules[m]:
-                    return False
-            return True
+        self.expansions_left = max_expansions
+        return self._expand(start_symbol, derivation_tree)
 
-        options = []
-        for incidence, rhs in self.rules[start_symbol]:
-            options.extend([rhs] * int(incidence))
-        result = random.choice(options)
-
-        if derivation_tree:
-            if is_terminal(result):
-                return "(" + start_symbol + " " + result + ")"
-            if max_expansions == 0:
-                return "(" + start_symbol + " ...)"
-            parts = []
-            for m in result.split(" "):
-                if self.rules[m]:
-                    parts.append(self.sample(derivation_tree, max_expansions - 1, m))
-                else:
-                    parts.append(m)
-            return "(" + start_symbol + " " + " ".join(parts) + ")"
-        if is_terminal(result):
-            return result
-        if max_expansions == 0:
+    def _expand(self, symbol, derivation_tree):
+        if self.expansions_left <= 0:
             return "..."
-        parts = []
-        for m in result.split(" "):
-            if self.rules[m]:
-                parts.append(self.sample(derivation_tree, max_expansions - 1, m))
-            else:
-                parts.append(m)
+        self.expansions_left -= 1
+
+        choices = self.rules[symbol]
+        rhs = random.choices(
+            [rhs for _, rhs in choices],
+            weights=[weight for weight, _ in choices],
+        )[0]
+
+        parts = [
+            self._expand(m, derivation_tree) if self.rules.get(m) else m
+            for m in rhs
+        ]
+        if derivation_tree:
+            return "(" + " ".join([symbol] + parts) + ")"
         return " ".join(parts)
 
 
