@@ -1,0 +1,5 @@
+/hw-3-lm/code/.venv/*
+/hw-3-lm/code/__pycache__/*
+/hw-3-lm/data/*
+/hw-3-lm/lexicons/*
+*.model
